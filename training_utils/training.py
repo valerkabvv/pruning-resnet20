@@ -80,7 +80,7 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
         
         val_loss_hist.append(valid_loss.item()/bs)
         train_loss_hist.append(train_loss.item()/bs)
-        val_acc_hist.append(val_acc.item()/bs)
+        val_acc_hist.append(valid_acc.item()/bs)
         train_acc_hist.append(train_acc.item()/bs)
         
         if valid_acc.item()/bs == max(val_acc_hist):
