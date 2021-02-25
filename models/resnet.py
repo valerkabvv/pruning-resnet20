@@ -4,7 +4,7 @@ from torch import nn
 def _weights_init(m):
     classname = m.__class__.__name__
     if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
-        init.kaiming_normal_(m.weight)
+        torch.nn.init.kaiming_normal_(m.weight)
 
 class building_block(nn.Module):
     
