@@ -91,7 +91,7 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
             print('early stopping')
             break
         
-        pbar.update(data.size(0))
+        pbar.update(1)
         pbar.set_description('val loss: {:.3f}, val acc: {:.3f}, train loss: {:.3f}, train acc: {:.3f}'.format(
             valid_loss/bs, valid_acc/bs, train_loss/bs, train_acc/bs))
         
