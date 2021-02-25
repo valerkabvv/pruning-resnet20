@@ -1,6 +1,11 @@
 import torch
 from torch import nn
 
+def _weights_init(m):
+    classname = m.__class__.__name__
+    if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+        init.kaiming_normal_(m.weight)
+
 class building_block(nn.Module):
     
     def __init__(self,in_channels, out_channels, stride = 1):
@@ -9,10 +14,10 @@ class building_block(nn.Module):
         
         
         self.conv_cell = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size = 3, stride = stride, padding = 1),
+            nn.Conv2d(in_channels, out_channels, kernel_size = 3, stride = stride, padding = 1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
-            nn.Conv2d(out_channels, out_channels,  kernel_size = 3, stride = 1, padding = 1),
+            nn.Conv2d(out_channels, out_channels,  kernel_size = 3, stride = 1, padding = 1, bias=False),
             nn.BatchNorm2d(out_channels)
         )
         
@@ -39,7 +44,7 @@ class resnet(nn.Module):
         
         super(resnet, self).__init__()
         
-        self.pre_conv = nn.Conv2d(3, channels[0], kernel_size = 3, padding = 1)
+        self.pre_conv = nn.Conv2d(3, channels[0], kernel_size = 3, padding = 1, bias=False)
         self.pre_norm = nn.BatchNorm2d(channels[0])
         
         self.res_layer1 = self._build_resudual_seq(channels[0], channels[0], 1, conv_lens[0])
@@ -48,6 +53,8 @@ class resnet(nn.Module):
         
         self.downsample = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Linear(channels[-1], classes)
+        
+        self.apply(_weights_init)
         
     
     @staticmethod

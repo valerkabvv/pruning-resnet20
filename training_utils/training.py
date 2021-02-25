@@ -52,8 +52,15 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
     
     model = model.to(DEVICE)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr = 1e-1)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience = 5)
+#     optimizer = torch.optim.Adam(model.parameters(), lr = 1e-1)
+#     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience = 5)
+    
+    optimizer = torch.optim.SGD(model.parameters(), 1e-1,
+                                momentum=0.9,
+                                weight_decay=1e-4)
+
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+                                                    milestones=[100, 150])
     
     loss = torch.nn.CrossEntropyLoss()
     
@@ -66,12 +73,13 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
     best_model = deepcopy(model)
     partience = 0
     
+    train_loader = DataLoader(train_dataset, batch_size = bs, shuffle = True, pin_memory = True)
+    valid_loader = DataLoader(valid_dataset, batch_size = bs, shuffle = False, pin_memory = True)
+        
     pbar = tqdm(total=epochs)
     pbar.set_description('training process')
     
     for _ in range(epochs):
-        train_loader = DataLoader(train_dataset, batch_size = bs, shuffle = True, pin_memory = True)
-        valid_loader = DataLoader(valid_dataset, batch_size = bs, shuffle = False, pin_memory = True)
         
         train_loss, train_acc = train_step(model, optimizer, train_loader, loss)
         valid_loss, valid_acc = valid_step(model, valid_loader, loss)

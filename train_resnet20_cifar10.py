@@ -10,4 +10,4 @@ dataset_test = CIFAR10(train = False, download = True, root = './', transform = 
 
 model = resnet20()
 
-train(model, dataset_test, dataset_train,128, 100)
+train(model, dataset_test, dataset_train,128, 200)
