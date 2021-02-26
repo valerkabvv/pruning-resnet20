@@ -50,19 +50,16 @@ def valid_step(model, loader, loss):
         
     return np.array(loss_hist).mean(), np.array(acc_hist).mean()
 
-def train(model, valid_dataset, train_dataset, bs, epochs, lr = 1e-1, path = 'best_model.ckpt'):
+def train(model, valid_dataset, train_dataset, bs, epochs,decay = [100, 150], lr = 1e-1, path = 'best_model.ckpt'):
     
     model = model.to(DEVICE)
-    
-#     optimizer = torch.optim.Adam(model.parameters(), lr = 1e-1)
-#     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience = 5)
     
     optimizer = torch.optim.SGD(model.parameters(), lr,
                                 momentum=0.9,
                                 weight_decay=1e-4)
 
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                    milestones=[100, 150])
+                                                    milestones=decay)
     
     loss = torch.nn.CrossEntropyLoss()
     
