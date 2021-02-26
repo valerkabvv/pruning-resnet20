@@ -5,6 +5,7 @@ def _weights_init(m):
     classname = m.__class__.__name__
     if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
         torch.nn.init.kaiming_normal_(m.weight)
+        
 
 class building_block(nn.Module):
     
@@ -25,10 +26,6 @@ class building_block(nn.Module):
         
         if (stride!=1) or (in_channels != out_channels):
             self.skip_connection = lambda x: torch.nn.functional.pad(x[:, :, ::2, ::2], (0, 0, 0, 0, out_channels//4, out_channels//4), "constant", 0)
-#             self.skip_connection = nn.Sequential(
-#                 nn.Conv2d(in_channels, out_channels, kernel_size = 1, stride = stride),
-#                 nn.BatchNorm2d(out_channels)
-#             )
         
     def forward(self, x):
         
