@@ -4,7 +4,7 @@ from copy import deepcopy
 from tqdm import tqdm
 import numpy as np
 
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
@@ -86,10 +86,10 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
         train_loss, train_acc = train_step(model, optimizer, train_loader, loss)
         valid_loss, valid_acc = valid_step(model, valid_loader, loss)
         
-        scheduler.step(valid_loss)
+        scheduler.step()
         
-        val_loss_hist.append(valid_loss.item()/bs)
-        train_loss_hist.append(train_loss.item()/bs)
+        val_loss_hist.append(valid_loss.item())
+        train_loss_hist.append(train_loss.item())
         val_acc_hist.append(valid_acc.item()/bs)
         train_acc_hist.append(train_acc.item()/bs)
         
@@ -103,7 +103,7 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
         
         pbar.update(1)
         pbar.set_description('val loss: {:.3f}, val acc: {:.3f}, train loss: {:.3f}, train acc: {:.3f}'.format(
-            valid_loss/bs, valid_acc/bs, train_loss/bs, train_acc/bs))
+            valid_loss, valid_acc/bs, train_loss, train_acc/bs))
         
     pbar.close()
     print('training finished with best accuracy : {:.3f}'.format(max(val_acc_hist)))
@@ -117,13 +117,14 @@ def validate(model, valid_dataset):
     pbar = tqdm(total=len(valid_loader))
     pbar.set_description('valid model')
     
+    model.to(DEVICE)
     model.eval()
     
     y_pred = []
     y_true = []
     
     with torch.no_grad():
-        for x, y in loader:
+        for x, y in valid_loader:
             x = x.to(DEVICE)
             y = y.to(DEVICE)
 
@@ -139,5 +140,4 @@ def validate(model, valid_dataset):
     y_pred = torch.cat(y_pred, dim = 0).cpu().numpy()
     y_true = torch.cat(y_true, dim = 0).cpu().numpy()
     
-    print('Accuracy score - {}'.format(accuracy_score(y_true, y_pred)))
     print(classification_report(y_true, y_pred))
