@@ -12,7 +12,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         model_path = 'best_model.ckpt'
     else:
-        model_path = sys.argv[1][1]
+        model_path = sys.argv[1]
     
     dataset_test = CIFAR10(train = False, download = True, root = './', transform = cifar_transform_test)
 
