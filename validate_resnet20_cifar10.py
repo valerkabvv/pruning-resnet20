@@ -5,9 +5,18 @@ from models.resnet import resnet20
 from data.CIFAR10_transforms import cifar_transform_test
 from training_utils.training import validate
 
-dataset_test = CIFAR10(train = False, download = True, root = './', transform = cifar_transform_test)
+import sys
 
-model = resnet20()
-model.load_state_dict(torch.load('best_model.ckpt'))
+if __name__ == '__main__':
+    
+    if len(sys.argv) == 1:
+        model_path = 'best_model.ckpt'
+    else:
+        model_path = sys.argv[1][1]
+    
+    dataset_test = CIFAR10(train = False, download = True, root = './', transform = cifar_transform_test)
 
-valitade(model, dataset_test)
+    model = resnet20()
+    model.load_state_dict(torch.load(model_path))
+
+    validate(model, dataset_test)
