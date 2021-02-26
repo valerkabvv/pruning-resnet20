@@ -4,6 +4,8 @@ from copy import deepcopy
 from tqdm import tqdm
 import numpy as np
 
+from sklearn.metrics import classification_report, accuracy_score
+
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 def train_step(model, optimizer, loader, loss):
@@ -106,3 +108,36 @@ def train(model, valid_dataset, train_dataset, bs, epochs, path = 'best_model.ck
     pbar.close()
     print('training finished with best accuracy : {:.3f}'.format(max(val_acc_hist)))
     torch.save(best_model.state_dict(), path)
+    
+    
+def validate(model, valid_dataset):
+    
+    valid_loader = DataLoader(valid_dataset, batch_size = 128, shuffle = False, pin_memory = True)
+    
+    pbar = tqdm(total=len(valid_loader))
+    pbar.set_description('valid model')
+    
+    model.eval()
+    
+    y_pred = []
+    y_true = []
+    
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(DEVICE)
+            y = y.to(DEVICE)
+
+            yh = model(x)
+
+            y_true.append(y)
+            y_pred.append(yh.argmax(dim=1))
+            
+            pbar.update(1)
+    
+    pbar.close()
+            
+    y_pred = torch.cat(y_pred, dim = 0).cpu().numpy()
+    y_true = torch.cat(y_true, dim = 0).cpu().numpy()
+    
+    print('Accuracy score - {}'.format(accuracy_score(y_true, y_pred)))
+    print(classification_report(y_true, y_pred))
