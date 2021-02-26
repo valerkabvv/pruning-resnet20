@@ -12,8 +12,6 @@ class building_block(nn.Module):
         
         super(building_block, self).__init__()
         
-        assert len(conv_lens)==len(channels)
-        
         
         self.conv_cell = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size = 3, stride = stride, padding = 1, bias=False),
@@ -45,6 +43,8 @@ class resnet(nn.Module):
     def __init__(self, conv_lens,channels, classes = 10):
         
         super(resnet, self).__init__()
+        
+        assert len(conv_lens)==len(channels)
         
         self.pre_conv = nn.Conv2d(3, channels[0], kernel_size = 3, padding = 1, bias=False)
         self.pre_norm = nn.BatchNorm2d(channels[0])
